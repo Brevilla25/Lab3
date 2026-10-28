@@ -115,6 +115,28 @@ int main(void)
 
 		int16_t X = X_LA | (X_HA << 8); //you want the sensor ot be able to read negative values
 
+		int16_t new_X = (X >> 6);
+
+		
+		//starting read for y 
+		uint8_t Y_LA = 0;
+		uint8_t Y_HA = 0;
+		//reads whats at the address and write to it
+		HAL_I2C_Mem_Read(&hi2c1, 0x19 << 1, 0x2A, I2C_MEMADD_SIZE_8BIT, &Y_LA, 1, HAL_MAX_DELAY);
+		HAL_I2C_Mem_Read(&hi2c1, 0x19 << 1, 0x2B, I2C_MEMADD_SIZE_8BIT, &Y_HA, 1, HAL_MAX_DELAY);
+
+		int16_t Y = Y_LA | (Y_HA << 8); //you want the sensor ot be able to read negative values
+		int16_t new_Y = (Y >> 6);
+
+        	
+		//starting read for Z
+		uint8_t X_LA = 0;
+		uint8_t X_HA = 0;
+		//reads whats at the address and write to it
+		HAL_I2C_Mem_Read(&hi2c1, 0x19 << 1, 0x28, I2C_MEMADD_SIZE_8BIT, &X_LA, 1, HAL_MAX_DELAY);
+		HAL_I2C_Mem_Read(&hi2c1, 0x19 << 1, 0x29, I2C_MEMADD_SIZE_8BIT, &X_HA, 1, HAL_MAX_DELAY);
+
+		int16_t X = X_LA | (X_HA << 8); //you want the sensor ot be able to read negative values
 
 		HAL_Delay(1000);
 	}
