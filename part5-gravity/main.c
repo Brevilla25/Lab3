@@ -130,14 +130,14 @@ int main(void)
 
         	
 		//starting read for Z
-		uint8_t X_LA = 0;
-		uint8_t X_HA = 0;
+		uint8_t Z_LA = 0;
+		uint8_t Z_HA = 0;
 		//reads whats at the address and write to it
-		HAL_I2C_Mem_Read(&hi2c1, 0x19 << 1, 0x28, I2C_MEMADD_SIZE_8BIT, &X_LA, 1, HAL_MAX_DELAY);
-		HAL_I2C_Mem_Read(&hi2c1, 0x19 << 1, 0x29, I2C_MEMADD_SIZE_8BIT, &X_HA, 1, HAL_MAX_DELAY);
+		HAL_I2C_Mem_Read(&hi2c1, 0x19 << 1, 0x28, I2C_MEMADD_SIZE_8BIT, &Z_LA, 1, HAL_MAX_DELAY);
+		HAL_I2C_Mem_Read(&hi2c1, 0x19 << 1, 0x29, I2C_MEMADD_SIZE_8BIT, &Z_HA, 1, HAL_MAX_DELAY);
 
-		int16_t X = X_LA | (X_HA << 8); //you want the sensor ot be able to read negative values
-
+		int16_t Z = Z_LA | (Z_HA << 8); //you want the sensor ot be able to read negative value
+		int16_t new_Z = (Z >> 6);
 		HAL_Delay(1000);
 	}
 	/* USER CODE END 3 */
