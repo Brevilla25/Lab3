@@ -21,7 +21,7 @@
 #include "i2c.h"
 #include "usart.h"
 #include "gpio.h"
-
+#include <stdio.h>
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -56,13 +56,23 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+int __io_putchar(int ch)
+{
 
+	HAL_UART_Transmit(&hlpuart1, (uint8_t *)&ch, 1, 10);
+	return ch;
+
+
+
+}
 /* USER CODE END 0 */
 
 /**
  * @brief  The application entry point.
  * @retval int
  */
+
+
 int main(void)
 {
 
@@ -94,6 +104,7 @@ int main(void)
 	uint8_t CTRL_REG1_A = 0x57;
 	HAL_I2C_Mem_Write(&hi2c1, 0x19 << 1, 0x20, I2C_MEMADD_SIZE_8BIT, &CTRL_REG1_A, 1, HAL_MAX_DELAY);
 
+	printf("\r\nHello from Nucleo-L4R5ZI-P!\r\n");
 
 	/* USER CODE END 2 */
 
@@ -106,7 +117,7 @@ int main(void)
 
 		/* USER CODE BEGIN 3 */
 		// The device 7 bits address value in datasheet must be shifted to the left before calling the interface
-		//starting read
+		//starting read for x
 		uint8_t X_LA = 0;
 		uint8_t X_HA = 0;
 		//reads whats at the address and write to it
@@ -114,11 +125,11 @@ int main(void)
 		HAL_I2C_Mem_Read(&hi2c1, 0x19 << 1, 0x29, I2C_MEMADD_SIZE_8BIT, &X_HA, 1, HAL_MAX_DELAY);
 
 		int16_t X = X_LA | (X_HA << 8); //you want the sensor ot be able to read negative values
-
+        //its now a 16 bit number but we only want the first 10 bits (since there are 6 unused ones) so we shift it to the right by 6, apply this to the rest
 		int16_t new_X = (X >> 6);
 
-		
-		//starting read for y 
+
+		//starting read for y
 		uint8_t Y_LA = 0;
 		uint8_t Y_HA = 0;
 		//reads whats at the address and write to it
@@ -128,17 +139,26 @@ int main(void)
 		int16_t Y = Y_LA | (Y_HA << 8); //you want the sensor ot be able to read negative values
 		int16_t new_Y = (Y >> 6);
 
-        	
+
 		//starting read for Z
 		uint8_t Z_LA = 0;
 		uint8_t Z_HA = 0;
 		//reads whats at the address and write to it
-		HAL_I2C_Mem_Read(&hi2c1, 0x19 << 1, 0x28, I2C_MEMADD_SIZE_8BIT, &Z_LA, 1, HAL_MAX_DELAY);
-		HAL_I2C_Mem_Read(&hi2c1, 0x19 << 1, 0x29, I2C_MEMADD_SIZE_8BIT, &Z_HA, 1, HAL_MAX_DELAY);
+		HAL_I2C_Mem_Read(&hi2c1, 0x19 << 1, 0x2C, I2C_MEMADD_SIZE_8BIT, &Z_LA, 1, HAL_MAX_DELAY);
+		HAL_I2C_Mem_Read(&hi2c1, 0x19 << 1, 0x2D, I2C_MEMADD_SIZE_8BIT, &Z_HA, 1, HAL_MAX_DELAY);
 
 		int16_t Z = Z_LA | (Z_HA << 8); //you want the sensor ot be able to read negative value
 		int16_t new_Z = (Z >> 6);
 		HAL_Delay(1000);
+
+		//calculate the new values for gravity, 3.9 from table 3, (to go from mg to G) 3.9/1000 = 0.0039
+		double new_x = new_X * 0.0039;
+		double new_y = new_Y * 0.0039;
+		double new_z = new_Z * 0.0039;
+
+		printf("\r\n count = %d X : %fG, count = %d Y: %fG, count = %d Z: %fG \r\n", new_X, new_x, new_Y, new_y, new_Z, new_z);
+
+
 	}
 	/* USER CODE END 3 */
 }
