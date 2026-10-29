@@ -26,3 +26,14 @@ OUT_Y_H_A : 010 1011
 OUT_Z_L_A : 010 1100
 OUT_Z_H_A : 010 1101
 
+
+part 5 - answer: 
+HAL_I2C_Mem_Read(&hi2c1, 0x19 << 1, 0x28, I2C_MEMADD_SIZE_8BIT, &X_LA, 1, HAL_MAX_DELAY);
+
+changed to: HAL_I2C_Mem_Read(&hi2c1, 0x19 << 1, addr, I2C_MEMADD_SIZE_8BIT, start, 6 , HAL_MAX_DELAY);
+
+- I changed the 0x28, which was the X -axis register address ( and veries per axis, per LA or HA), to the X-axis register address (start) or'ed with a mask to change the MSB to 1 in order to enable the auto increment setting mentioned in the datasheet. 
+- then I changed the 1 byte to 6 since there was 6 different read functions (each for a different axis LA/HA), this will allow us to move through all the registers (0x28 to 0x2D)
+- Lastly, I initialized an array of size 6, this way I could store each memread into the array and call it so I could build X, Y, and, Z after the increment is finished. Everything else pretty much stayed the same 
+
+
